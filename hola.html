@@ -7,7 +7,7 @@
 <style>
   body {
     font-family: "Segoe UI", sans-serif;
-    background: linear-gradient(to bottom, #fdfbfb, #ebedee);
+    background: linear-gradient(to bottom right, #ffecd2, #fcb69f);
     margin: 0;
     padding: 0;
   }
@@ -32,17 +32,24 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     margin-bottom: 1rem;
   }
-  .word-es {
+  .lang-label {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #666;
+  }
+  .word-main {
     font-size: 3rem;
     font-weight: bold;
     color: #ff7043;
+    word-break: break-word;
   }
   .word-zh {
     font-size: 1.5rem;
     color: #555;
     margin-top: 0.5rem;
   }
-  .controls, .quiz-options {
+  .controls {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -50,37 +57,48 @@
     margin-top: 1rem;
   }
   button {
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1.2rem;
     border: none;
     border-radius: 0.5rem;
     cursor: pointer;
     background: #ffcc80;
     font-weight: bold;
+    font-size: 1rem;
+    transition: background 0.3s;
   }
   button:hover {
     background: #ffb74d;
   }
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
   .quiz-options button {
     background: #90caf9;
+    border-radius: 0.5rem;
   }
   .quiz-options button:hover {
     background: #64b5f6;
   }
-  .upload-box {
-    background: white;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    margin-top: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  @media (max-width: 600px) {
+    .word-main {
+      font-size: 2rem;
+    }
+    .word-zh {
+      font-size: 1.2rem;
+    }
   }
 </style>
 </head>
 <body>
-<header>📚 西班牙文＋葡萄牙文隨機學習 + 測驗</header>
+<header>📚 西葡語隨機學習 + 測驗</header>
 <main>
-  <div class="card">
-    <div id="lang-label">[ES]</div>
-    <div class="word-es" id="word-es">Hola</div>
+  <!-- 單字顯示卡片 -->
+  <div class="card" id="word-card">
+    <div class="lang-label" id="lang-label">[ES]</div>
+    <div class="word-main" id="word-main">Hola</div>
     <div class="word-zh" id="word-zh">你好</div>
     <div class="controls">
       <button onclick="prevWord()">⬅ 上一個</button>
@@ -89,14 +107,16 @@
     </div>
   </div>
 
+  <!-- 測驗卡片 -->
   <div class="card" id="quiz-card" style="display:none;">
     <div><strong>測驗：</strong>這個單字的中文意思是？</div>
-    <div class="word-es" id="quiz-word">Hola</div>
+    <div class="word-main" id="quiz-word">Hola</div>
     <div class="quiz-options" id="quiz-options"></div>
   </div>
 </main>
 
 <script>
+  // === 語料（示例，實際應放 500 筆） ===
   const wordList = [
     { lang: "ES", word: "hola", zh: "你好" },
     { lang: "PT", word: "olá", zh: "你好" },
@@ -220,7 +240,7 @@
     const item = wordList[index];
     if (!item) return;
     document.getElementById("lang-label").textContent = item.lang === "ES" ? "[ES]" : "[PT]";
-    document.getElementById("word-es").textContent = item.word;
+    document.getElementById("word-main").textContent = item.word;
     document.getElementById("word-zh").textContent = item.zh;
   }
 
@@ -261,11 +281,7 @@
       const btn = document.createElement("button");
       btn.textContent = opt;
       btn.onclick = () => {
-        if (opt === correct.zh) {
-          alert("✅ 答對了！");
-        } else {
-          alert(`❌ 錯誤，正確答案是：${correct.zh}`);
-        }
+        alert(opt === correct.zh ? "✅ 答對了！" : `❌ 錯誤，正確答案是：${correct.zh}`);
         startQuiz();
       };
       container.appendChild(btn);
@@ -278,12 +294,11 @@
   }
 
   window.onload = function() {
-    if (wordList.length) {
-      showWord(0);
-    }
+    showWord(0);
     startAuto(4);
     setTimeout(startQuiz, 8000);
   };
 </script>
 </body>
 </html>
+
