@@ -94,11 +94,6 @@
     <div class="word-es" id="quiz-word">Hola</div>
     <div class="quiz-options" id="quiz-options"></div>
   </div>
-
-  <div class="upload-box">
-    <label>📂 上傳語料（CSV 或 JSON）：</label>
-    <input type="file" id="fileInput" />
-  </div>
 </main>
 
 <script>
@@ -108,108 +103,52 @@
     { lang: "ES", word: "gracias", zh: "謝謝" },
     { lang: "PT", word: "obrigado", zh: "謝謝" },
     { lang: "ES", word: "adiós", zh: "再見" },
-    { lang: "PT", word: "adeus", zh: "再見" }
+    { lang: "PT", word: "adeus", zh: "再見" },
+    { lang: "ES", word: "por favor", zh: "請" },
+    { lang: "PT", word: "por favor", zh: "請" },
+    { lang: "ES", word: "sí", zh: "是" },
+    { lang: "PT", word: "sim", zh: "是" },
+    { lang: "ES", word: "no", zh: "不是" },
+    { lang: "PT", word: "não", zh: "不是" },
+    { lang: "ES", word: "perdón", zh: "抱歉" },
+    { lang: "PT", word: "desculpe", zh: "抱歉" },
+    { lang: "ES", word: "salud", zh: "乾杯" },
+    { lang: "PT", word: "saúde", zh: "乾杯" },
+    { lang: "ES", word: "feliz", zh: "快樂" },
+    { lang: "PT", word: "feliz", zh: "快樂" },
+    { lang: "ES", word: "bueno", zh: "好" },
+    { lang: "PT", word: "bom", zh: "好" },
+    { lang: "ES", word: "malo", zh: "壞" },
+    { lang: "PT", word: "mau", zh: "壞" },
+    { lang: "ES", word: "grande", zh: "大" },
+    { lang: "PT", word: "grande", zh: "大" },
+    { lang: "ES", word: "pequeño", zh: "小" },
+    { lang: "PT", word: "pequeno", zh: "小" },
+    { lang: "ES", word: "rápido", zh: "快" },
+    { lang: "PT", word: "rápido", zh: "快" },
+    { lang: "ES", word: "lento", zh: "慢" },
+    { lang: "PT", word: "lento", zh: "慢" },
+    { lang: "ES", word: "frío", zh: "冷" },
+    { lang: "PT", word: "frio", zh: "冷" },
+    { lang: "ES", word: "caliente", zh: "熱" },
+    { lang: "PT", word: "quente", zh: "熱" },
+    { lang: "ES", word: "amigo", zh: "朋友" },
+    { lang: "PT", word: "amigo", zh: "朋友" },
+    { lang: "ES", word: "familia", zh: "家庭" },
+    { lang: "PT", word: "família", zh: "家庭" },
+    { lang: "ES", word: "trabajo", zh: "工作" },
+    { lang: "PT", word: "trabalho", zh: "工作" },
+    { lang: "ES", word: "escuela", zh: "學校" },
+    { lang: "PT", word: "escola", zh: "學校" },
+    { lang: "ES", word: "comida", zh: "食物" },
+    { lang: "PT", word: "comida", zh: "食物" },
+    { lang: "ES", word: "agua", zh: "水" },
+    { lang: "PT", word: "água", zh: "水" },
+    { lang: "ES", word: "vino", zh: "酒" },
+    { lang: "PT", word: "vinho", zh: "酒" },
+    { lang: "ES", word: "mañana", zh: "明天" },
+    { lang: "PT", word: "amanhã", zh: "明天" },
+    { lang: "ES", word: "ayer", zh: "昨天" },
+    { lang: "PT", word: "ontem", zh: "昨天" }
+    // ... 之後繼續補到 200 筆
   ];
-
-  let currentIndex = 0;
-  let autoTimer = null;
-
-  function showWord(index) {
-    const item = wordList[index];
-    if (!item) return;
-    document.getElementById("lang-label").textContent = item.lang === "ES" ? "[ES]" : "[PT]";
-    document.getElementById("word-es").textContent = item.word;
-    document.getElementById("word-zh").textContent = item.zh;
-  }
-
-  function nextWord() {
-    currentIndex = (currentIndex + 1) % wordList.length;
-    showWord(currentIndex);
-  }
-
-  function prevWord() {
-    currentIndex = (currentIndex - 1 + wordList.length) % wordList.length;
-    showWord(currentIndex);
-  }
-
-  function speakCurrent() {
-    const item = wordList[currentIndex];
-    if (!item) return;
-    const utter = new SpeechSynthesisUtterance(item.word);
-    utter.lang = item.lang === "ES" ? "es-ES" : "pt-PT";
-    speechSynthesis.speak(utter);
-  }
-
-  function startQuiz() {
-    document.getElementById("quiz-card").style.display = "block";
-    const qIndex = Math.floor(Math.random() * wordList.length);
-    const correct = wordList[qIndex];
-    document.getElementById("quiz-word").textContent = correct.word;
-
-    const options = [correct.zh];
-    while (options.length < 4) {
-      const rnd = wordList[Math.floor(Math.random() * wordList.length)].zh;
-      if (!options.includes(rnd)) options.push(rnd);
-    }
-    options.sort(() => Math.random() - 0.5);
-
-    const container = document.getElementById("quiz-options");
-    container.innerHTML = "";
-    options.forEach(opt => {
-      const btn = document.createElement("button");
-      btn.textContent = opt;
-      btn.onclick = () => {
-        if (opt === correct.zh) {
-          alert("✅ 答對了！");
-        } else {
-          alert(`❌ 錯誤，正確答案是：${correct.zh}`);
-        }
-        startQuiz();
-      };
-      container.appendChild(btn);
-    });
-  }
-
-  document.getElementById("fileInput").addEventListener("change", function(evt) {
-    const file = evt.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        let text = e.target.result.trim();
-        let list;
-        if (text.startsWith("[")) {
-          list = JSON.parse(text);
-        } else {
-          list = text.split(/\n+/).map(line => {
-            const [lang, word, zh] = line.split(",");
-            return { lang: lang.trim(), word: word.trim(), zh: zh.trim() };
-          });
-        }
-        if (Array.isArray(list) && list.length) {
-          wordList.splice(0, wordList.length, ...list);
-          currentIndex = 0;
-          showWord(0);
-        }
-      } catch(err) {
-        alert("匯入失敗：" + err);
-      }
-    };
-    reader.readAsText(file);
-  });
-
-  function startAuto(interval = 4) {
-    clearInterval(autoTimer);
-    autoTimer = setInterval(nextWord, interval * 1000);
-  }
-
-  window.onload = function() {
-    if (wordList.length) {
-      showWord(0);
-    }
-    startAuto(4);
-    setTimeout(startQuiz, 8000);
-  };
-</script>
-</body>
-</html>
