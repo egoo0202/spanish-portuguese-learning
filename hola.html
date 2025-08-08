@@ -150,5 +150,140 @@
     { lang: "PT", word: "amanhã", zh: "明天" },
     { lang: "ES", word: "ayer", zh: "昨天" },
     { lang: "PT", word: "ontem", zh: "昨天" }
-    // ... 之後繼續補到 200 筆
+        { lang: "ES", word: "noche", zh: "晚上" },
+    { lang: "PT", word: "noite", zh: "晚上" },
+    { lang: "ES", word: "tarde", zh: "下午" },
+    { lang: "PT", word: "tarde", zh: "下午" },
+    { lang: "ES", word: "semana", zh: "週" },
+    { lang: "PT", word: "semana", zh: "週" },
+    { lang: "ES", word: "año", zh: "年" },
+    { lang: "PT", word: "ano", zh: "年" },
+    { lang: "ES", word: "mes", zh: "月" },
+    { lang: "PT", word: "mês", zh: "月" },
+    { lang: "ES", word: "hoy", zh: "今天" },
+    { lang: "PT", word: "hoje", zh: "今天" },
+    { lang: "ES", word: "casa", zh: "房子" },
+    { lang: "PT", word: "casa", zh: "房子" },
+    { lang: "ES", word: "calle", zh: "街道" },
+    { lang: "PT", word: "rua", zh: "街道" },
+    { lang: "ES", word: "ciudad", zh: "城市" },
+    { lang: "PT", word: "cidade", zh: "城市" },
+    { lang: "ES", word: "país", zh: "國家" },
+    { lang: "PT", word: "país", zh: "國家" },
+    { lang: "ES", word: "mar", zh: "海" },
+    { lang: "PT", word: "mar", zh: "海" },
+    { lang: "ES", word: "montaña", zh: "山" },
+    { lang: "PT", word: "montanha", zh: "山" },
+    { lang: "ES", word: "río", zh: "河流" },
+    { lang: "PT", word: "rio", zh: "河流" },
+    { lang: "ES", word: "bosque", zh: "森林" },
+    { lang: "PT", word: "floresta", zh: "森林" },
+    { lang: "ES", word: "flor", zh: "花" },
+    { lang: "PT", word: "flor", zh: "花" },
+    { lang: "ES", word: "árbol", zh: "樹" },
+    { lang: "PT", word: "árvore", zh: "樹" },
+    { lang: "ES", word: "sol", zh: "太陽" },
+    { lang: "PT", word: "sol", zh: "太陽" },
+    { lang: "ES", word: "luna", zh: "月亮" },
+    { lang: "PT", word: "lua", zh: "月亮" },
+    { lang: "ES", word: "estrella", zh: "星星" },
+    { lang: "PT", word: "estrela", zh: "星星" },
+    { lang: "ES", word: "cielo", zh: "天空" },
+    { lang: "PT", word: "céu", zh: "天空" },
+    { lang: "ES", word: "nube", zh: "雲" },
+    { lang: "PT", word: "nuvem", zh: "雲" },
+    { lang: "ES", word: "lluvia", zh: "雨" },
+    { lang: "PT", word: "chuva", zh: "雨" },
+    { lang: "ES", word: "nieve", zh: "雪" },
+    { lang: "PT", word: "neve", zh: "雪" },
+    { lang: "ES", word: "viento", zh: "風" },
+    { lang: "PT", word: "vento", zh: "風" },
+    { lang: "ES", word: "fuego", zh: "火" },
+    { lang: "PT", word: "fogo", zh: "火" },
+    { lang: "ES", word: "tierra", zh: "土地" },
+    { lang: "PT", word: "terra", zh: "土地" },
+    { lang: "ES", word: "aire", zh: "空氣" },
+    { lang: "PT", word: "ar", zh: "空氣" },
+    { lang: "ES", word: "animal", zh: "動物" },
+    { lang: "PT", word: "animal", zh: "動物" },
+    { lang: "ES", word: "perro", zh: "狗" },
+    { lang: "PT", word: "cachorro", zh: "狗" },
+    { lang: "ES", word: "gato", zh: "貓" },
+    { lang: "PT", word: "gato", zh: "貓" }
+    // ... 持續補到 500 筆
   ];
+
+  let currentIndex = 0;
+  let autoTimer = null;
+
+  function showWord(index) {
+    const item = wordList[index];
+    if (!item) return;
+    document.getElementById("lang-label").textContent = item.lang === "ES" ? "[ES]" : "[PT]";
+    document.getElementById("word-es").textContent = item.word;
+    document.getElementById("word-zh").textContent = item.zh;
+  }
+
+  function nextWord() {
+    currentIndex = (currentIndex + 1) % wordList.length;
+    showWord(currentIndex);
+  }
+
+  function prevWord() {
+    currentIndex = (currentIndex - 1 + wordList.length) % wordList.length;
+    showWord(currentIndex);
+  }
+
+  function speakCurrent() {
+    const item = wordList[currentIndex];
+    if (!item) return;
+    const utter = new SpeechSynthesisUtterance(item.word);
+    utter.lang = item.lang === "ES" ? "es-ES" : "pt-PT";
+    speechSynthesis.speak(utter);
+  }
+
+  function startQuiz() {
+    document.getElementById("quiz-card").style.display = "block";
+    const qIndex = Math.floor(Math.random() * wordList.length);
+    const correct = wordList[qIndex];
+    document.getElementById("quiz-word").textContent = correct.word;
+
+    const options = [correct.zh];
+    while (options.length < 4) {
+      const rnd = wordList[Math.floor(Math.random() * wordList.length)].zh;
+      if (!options.includes(rnd)) options.push(rnd);
+    }
+    options.sort(() => Math.random() - 0.5);
+
+    const container = document.getElementById("quiz-options");
+    container.innerHTML = "";
+    options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.textContent = opt;
+      btn.onclick = () => {
+        if (opt === correct.zh) {
+          alert("✅ 答對了！");
+        } else {
+          alert(`❌ 錯誤，正確答案是：${correct.zh}`);
+        }
+        startQuiz();
+      };
+      container.appendChild(btn);
+    });
+  }
+
+  function startAuto(interval = 4) {
+    clearInterval(autoTimer);
+    autoTimer = setInterval(nextWord, interval * 1000);
+  }
+
+  window.onload = function() {
+    if (wordList.length) {
+      showWord(0);
+    }
+    startAuto(4);
+    setTimeout(startQuiz, 8000);
+  };
+</script>
+</body>
+</html>
